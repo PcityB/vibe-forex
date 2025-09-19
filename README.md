@@ -70,8 +70,8 @@ This application provides a complete workflow for forex pattern mining:
 
 1. **Clone and Install**
    ```bash
-   git clone <repository-url>
-   cd forex-pattern-mining-dashboard
+   git clone https://github.com/PcityB/vibe-forex.git
+   cd vibe-forex
    pnpm install
    ```
 
