@@ -50,7 +50,7 @@ export default function RootLayout({
             <div className="container mx-auto px-6 py-6">
               <div className="flex items-center justify-between text-sm text-purple-300">
                 <p>
-                  Based on research: "An Algorithmic Framework for Frequent Intraday Pattern Recognition and Exploitation in Forex Market"
+                  Based on research: &ldquo;An Algorithmic Framework for Frequent Intraday Pattern Recognition and Exploitation in Forex Market&rdquo;
                 </p>
                 <div className="flex items-center space-x-4">
                   <span>Powered by Kaggle API</span>

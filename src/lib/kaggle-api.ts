@@ -193,7 +193,7 @@ export class KaggleApiClient {
 
       // If Kaggle output not available, generate demo results
       console.log('Generating demo results for completed job');
-      const demoResults = this.generateDemoResults(jobId);
+      const demoResults = this.generateDemoResults();
       
       return {
         jobId,
@@ -211,7 +211,7 @@ export class KaggleApiClient {
   /**
    * Generate realistic demo results for testing
    */
-  private generateDemoResults(jobId: string) {
+  private generateDemoResults() {
     const patterns = [];
     const numPatterns = Math.floor(Math.random() * 15) + 10; // 10-25 patterns
     

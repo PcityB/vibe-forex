@@ -73,7 +73,7 @@ export function ResultsAnalyzer({ results, onViewModeChange, viewMode }: Results
                   key={mode}
                   variant={viewMode === mode ? "default" : "outline"}
                   size="sm"
-                  onClick={() => onViewModeChange(mode as any)}
+                  onClick={() => onViewModeChange(mode as 'overview' | 'detailed' | 'comparison')}
                   className={viewMode === mode 
                     ? "bg-purple-600 hover:bg-purple-700" 
                     : "border-purple-500 text-purple-300 hover:bg-purple-500/10"
@@ -114,7 +114,7 @@ export function ResultsAnalyzer({ results, onViewModeChange, viewMode }: Results
       </Card>
 
       {/* Analysis Content */}
-      <Tabs value={viewMode} onValueChange={(value: any) => onViewModeChange(value)} className="w-full">
+      <Tabs value={viewMode} onValueChange={(value: string) => onViewModeChange(value as 'overview' | 'detailed' | 'comparison')} className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-black/20">
           <TabsTrigger value="overview" className="text-white">Overview</TabsTrigger>
           <TabsTrigger value="detailed" className="text-white">Detailed Analysis</TabsTrigger>

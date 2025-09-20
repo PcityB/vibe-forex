@@ -41,7 +41,7 @@ export class DirectKaggleService {
   /**
    * List existing kernels
    */
-  async listKernels(): Promise<any[]> {
+  async listKernels(): Promise<unknown[]> {
     try {
       const response = await fetch(`${this.baseUrl}/kernels/list`, {
         headers: {
@@ -64,7 +64,7 @@ export class DirectKaggleService {
   /**
    * Create a new dataset for forex data
    */
-  async createDataset(title: string, forexData: any[]): Promise<string | null> {
+  async createDataset(title: string, forexData: Record<string, unknown>[]): Promise<string | null> {
     try {
       const datasetMetadata = {
         title: title,
@@ -153,7 +153,7 @@ export class DirectKaggleService {
   /**
    * Get kernel status
    */
-  async getKernelStatus(kernelRef: string): Promise<any> {
+  async getKernelStatus(kernelRef: string): Promise<unknown> {
     try {
       const response = await fetch(`${this.baseUrl}/kernels/status/${kernelRef}`, {
         headers: {
@@ -197,7 +197,7 @@ export class DirectKaggleService {
   /**
    * Convert data to CSV format
    */
-  private convertToCSV(data: any[]): string {
+  private convertToCSV(data: Record<string, unknown>[]): string {
     if (!data || data.length === 0) return '';
     
     const headers = Object.keys(data[0]);

@@ -376,7 +376,9 @@ function generatePatternInsights(patterns: DiscoveredPattern[], statistics: Patt
 
 /**
  * Advanced pattern filtering with multiple criteria
+ * @unused - Available for future enhancement
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function applyAdvancedPatternFiltering(patterns: DiscoveredPattern[], criteria: {
   minSharpeRatio?: number;
   maxDrawdown?: number;

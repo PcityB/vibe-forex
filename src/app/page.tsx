@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,21 +30,6 @@ export default function ForexPatternMiningDashboard() {
   }>({ username: '', apiKey: '' });
 
   const [activeTab, setActiveTab] = useState('configure');
-
-  // Auto-refresh job status if there's an active job
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
-    
-    if (dashboardState.activeJob && dashboardState.activeJob.status === 'running') {
-      interval = setInterval(async () => {
-        await refreshJobStatus(dashboardState.activeJob!.id);
-      }, 10000); // Check every 10 seconds
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [dashboardState.activeJob?.id, dashboardState.activeJob?.status]);
 
   const updateDashboardState = (updates: Partial<DashboardState>) => {
     setDashboardState(prev => ({
@@ -103,7 +88,7 @@ export default function ForexPatternMiningDashboard() {
     }
   };
 
-  const refreshJobStatus = async (jobId: string) => {
+  const refreshJobStatus = useCallback(async (jobId: string) => {
     try {
       const response = await fetch(`/api/kaggle/status?jobId=${jobId}`);
 
@@ -121,15 +106,15 @@ export default function ForexPatternMiningDashboard() {
 
         // If job completed, try to fetch results
         if (updatedJob.status === 'completed') {
-          await fetchJobResults(jobId);
+          fetchJobResults(jobId);
         }
       }
     } catch (error) {
       console.error('Error refreshing job status:', error);
     }
-  };
+  }, [dashboardState.jobHistory]);
 
-  const fetchJobResults = async (jobId: string) => {
+  const fetchJobResults = useCallback(async (jobId: string) => {
     try {
       const response = await fetch(`/api/kaggle/results?jobId=${jobId}`);
 
@@ -144,7 +129,23 @@ export default function ForexPatternMiningDashboard() {
     } catch (error) {
       console.error('Error fetching job results:', error);
     }
-  };
+  }, []);
+
+  // Auto-refresh job status if there's an active job
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const currentJob = dashboardState.activeJob;
+    
+    if (currentJob && currentJob.status === 'running') {
+      interval = setInterval(async () => {
+        await refreshJobStatus(currentJob.id);
+      }, 10000); // Check every 10 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [dashboardState.activeJob, refreshJobStatus]);
 
   const handleCancelJob = async (jobId: string) => {
     try {

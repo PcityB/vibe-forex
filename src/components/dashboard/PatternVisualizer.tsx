@@ -132,7 +132,7 @@ export function PatternVisualizer({ patterns, selectedPatterns, onPatternSelect,
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2">
               <label className="text-white text-sm">View:</label>
-              <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
+              <Select value={viewMode} onValueChange={(value: 'patterns' | 'frequency' | 'performance') => setViewMode(value)}>
                 <SelectTrigger className="w-32 bg-black/20 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -146,7 +146,7 @@ export function PatternVisualizer({ patterns, selectedPatterns, onPatternSelect,
 
             <div className="flex items-center space-x-2">
               <label className="text-white text-sm">Filter:</label>
-              <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+              <Select value={filterType} onValueChange={(value: 'all' | 'bullish' | 'bearish' | 'neutral') => setFilterType(value)}>
                 <SelectTrigger className="w-24 bg-black/20 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -161,7 +161,7 @@ export function PatternVisualizer({ patterns, selectedPatterns, onPatternSelect,
 
             <div className="flex items-center space-x-2">
               <label className="text-white text-sm">Sort by:</label>
-              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <Select value={sortBy} onValueChange={(value: 'confidence' | 'support' | 'profitability') => setSortBy(value)}>
                 <SelectTrigger className="w-32 bg-black/20 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -377,7 +377,7 @@ export function PatternVisualizer({ patterns, selectedPatterns, onPatternSelect,
                       borderRadius: '8px',
                       color: '#fff'
                     }}
-                    formatter={(value: any, name: string) => [
+                    formatter={(value: number, name: string) => [
                       `${Number(value).toFixed(1)}%`,
                       name.charAt(0).toUpperCase() + name.slice(1)
                     ]}
