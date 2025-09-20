@@ -153,7 +153,7 @@ export function PatternVisualizer({ patterns, selectedPatterns, onPatternSelect,
                 <SelectContent className="bg-black border-gray-600">
                   <SelectItem value="all" className="text-white hover:bg-gray-700">All</SelectItem>
                   <SelectItem value="bullish" className="text-white hover:bg-gray-700">Bullish</SelectItem>
-                  <SelectItem value="bearish" className="text-white hover:bg-gray-700">bearish</SelectItem>
+                  <SelectItem value="bearish" className="text-white hover:bg-gray-700">Bearish</SelectItem>
                   <SelectItem value="neutral" className="text-white hover:bg-gray-700">Neutral</SelectItem>
                 </SelectContent>
               </Select>
@@ -240,9 +240,10 @@ export function PatternVisualizer({ patterns, selectedPatterns, onPatternSelect,
             <CardContent>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart>
+                  <LineChart data={selectedPatterns.length > 0 ? formatPatternData(patterns.find(p => p.id === selectedPatterns[0]) || patterns[0]) : []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                     <XAxis 
+                      dataKey="x"
                       stroke="#9ca3af" 
                       tick={{ fill: '#9ca3af', fontSize: 12 }}
                       label={{ value: 'Time Steps', position: 'insideBottom', offset: -10, style: { textAnchor: 'middle', fill: '#9ca3af' } }}
@@ -265,13 +266,11 @@ export function PatternVisualizer({ patterns, selectedPatterns, onPatternSelect,
                       const pattern = patterns.find(p => p.id === patternId);
                       if (!pattern || !pattern.pricePoints) return null;
                       
-                      const data = formatPatternData(pattern);
                       return (
                         <Line
                           key={pattern.id}
                           type="monotone"
                           dataKey="y"
-                          data={data}
                           stroke={getPatternColor(pattern)}
                           strokeWidth={2}
                           dot={false}

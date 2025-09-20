@@ -81,3 +81,45 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { action, username = 'netszy', apiKey = '60a515ec7742c89c180861c1ec823493' } = body;
+
+    if (action === 'validate') {
+      // Validate credentials using the same logic as GET
+      console.log(`Validating Kaggle API credentials for username: ${username}`);
+      
+      const response = await fetch('https://www.kaggle.com/api/v1/kernels/list', {
+        headers: {
+          'Authorization': `Basic ${btoa(`${username}:${apiKey}`)}`
+        }
+      });
+
+      return NextResponse.json({
+        success: response.ok,
+        data: {
+          valid: response.ok,
+          status: response.status,
+          message: response.ok ? 'Credentials are valid' : 'Invalid credentials'
+        },
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    return NextResponse.json({
+      success: false,
+      error: 'Unsupported action. Use action: "validate"',
+      timestamp: new Date().toISOString()
+    }, { status: 400 });
+
+  } catch (error) {
+    console.error('Direct Kaggle POST error:', error);
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    }, { status: 500 });
+  }
+}

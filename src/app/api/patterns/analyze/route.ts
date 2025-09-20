@@ -303,7 +303,7 @@ function calculateCorrelation(x: number[], y: number[]): number {
   return denominator === 0 ? 0 : numerator / denominator;
 }
 
-function generatePatternInsights(_patterns: DiscoveredPattern[], statistics: PatternMiningStatistics) {
+function generatePatternInsights(patterns: DiscoveredPattern[], statistics: PatternMiningStatistics) {
   const insights = {
     keyFindings: [] as string[],
     recommendations: [] as string[],
@@ -352,5 +352,58 @@ function generatePatternInsights(_patterns: DiscoveredPattern[], statistics: Pat
     insights.opportunities.push('High confidence patterns available - suitable for automated trading');
   }
 
+  // Advanced pattern analysis insights
+  if (patterns.length > 0) {
+    const highPerformancePatterns = patterns.filter(p => (p.profitability || 0) > 0.05 && p.confidence > 0.8);
+    if (highPerformancePatterns.length > 0) {
+      insights.opportunities.push(`${highPerformancePatterns.length} high-performance patterns identified (>5% profit, >80% confidence)`);
+    }
+
+    const consistentPatterns = patterns.filter(p => p.support > 0.1 && (p.sharpeRatio || 0) > 1.0);
+    if (consistentPatterns.length > 0) {
+      insights.keyFindings.push(`${consistentPatterns.length} patterns show both high frequency and good risk-adjusted returns`);
+    }
+
+    // Risk assessment
+    const riskyStagterns = patterns.filter(p => (p.maxDrawdown || 0) > 0.1);
+    if (riskyStagterns.length > patterns.length * 0.3) {
+      insights.riskWarnings.push('High proportion of patterns show significant drawdown risk (>10%)');
+    }
+  }
+
   return insights;
+}
+
+/**
+ * Advanced pattern filtering with multiple criteria
+ */
+function applyAdvancedPatternFiltering(patterns: DiscoveredPattern[], criteria: {
+  minSharpeRatio?: number;
+  maxDrawdown?: number;
+  minFrequency?: number;
+  excludeTypes?: string[];
+}): DiscoveredPattern[] {
+  return patterns.filter(pattern => {
+    // Sharpe ratio filter
+    if (criteria.minSharpeRatio && (pattern.sharpeRatio || 0) < criteria.minSharpeRatio) {
+      return false;
+    }
+
+    // Max drawdown filter
+    if (criteria.maxDrawdown && (pattern.maxDrawdown || 0) > criteria.maxDrawdown) {
+      return false;
+    }
+
+    // Minimum frequency filter
+    if (criteria.minFrequency && (pattern.frequency || 0) < criteria.minFrequency) {
+      return false;
+    }
+
+    // Exclude specific pattern types
+    if (criteria.excludeTypes && criteria.excludeTypes.includes(pattern.type)) {
+      return false;
+    }
+
+    return true;
+  });
 }

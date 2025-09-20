@@ -439,3 +439,112 @@ function calculateEMA(prices: number[], period: number): number[] {
   
   return ema;
 }
+
+/**
+ * Detect and remove outliers from forex data using IQR method
+ */
+export function detectAndCleanOutliers(data: ForexDataPoint[]): {
+  cleaned: ForexDataPoint[];
+  outliers: ForexDataPoint[];
+  stats: { removed: number; total: number; percentage: number };
+} {
+  if (data.length < 4) {
+    return {
+      cleaned: data,
+      outliers: [],
+      stats: { removed: 0, total: data.length, percentage: 0 }
+    };
+  }
+
+  const prices = data.map(d => d.close);
+  
+  // Calculate quartiles
+  const sorted = [...prices].sort((a, b) => a - b);
+  const q1Index = Math.floor(sorted.length * 0.25);
+  const q3Index = Math.floor(sorted.length * 0.75);
+  const q1 = sorted[q1Index];
+  const q3 = sorted[q3Index];
+  const iqr = q3 - q1;
+  
+  // Define outlier boundaries
+  const lowerBound = q1 - (1.5 * iqr);
+  const upperBound = q3 + (1.5 * iqr);
+  
+  // Separate outliers from clean data
+  const cleaned: ForexDataPoint[] = [];
+  const outliers: ForexDataPoint[] = [];
+  
+  data.forEach(point => {
+    if (point.close >= lowerBound && point.close <= upperBound &&
+        point.high >= lowerBound && point.high <= upperBound &&
+        point.low >= lowerBound && point.low <= upperBound &&
+        point.open >= lowerBound && point.open <= upperBound) {
+      cleaned.push(point);
+    } else {
+      outliers.push(point);
+    }
+  });
+  
+  return {
+    cleaned,
+    outliers,
+    stats: {
+      removed: outliers.length,
+      total: data.length,
+      percentage: (outliers.length / data.length) * 100
+    }
+  };
+}
+
+/**
+ * Calculate volatility metrics for forex data
+ */
+export function calculateVolatilityMetrics(data: ForexDataPoint[]): {
+  dailyVolatility: number;
+  realizedVolatility: number;
+  garchVolatility: number;
+  averageTrueRange: number;
+} {
+  if (data.length < 2) {
+    return { dailyVolatility: 0, realizedVolatility: 0, garchVolatility: 0, averageTrueRange: 0 };
+  }
+
+  // Calculate returns
+  const returns = [];
+  for (let i = 1; i < data.length; i++) {
+    returns.push(Math.log(data[i].close / data[i - 1].close));
+  }
+
+  // Daily volatility (standard deviation of returns)
+  const meanReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns.length;
+  const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - meanReturn, 2), 0) / returns.length;
+  const dailyVolatility = Math.sqrt(variance);
+
+  // Realized volatility (sum of squared returns)
+  const realizedVolatility = Math.sqrt(returns.reduce((sum, ret) => sum + ret * ret, 0));
+
+  // Simplified GARCH(1,1) volatility estimate
+  let garchVol = dailyVolatility;
+  const alpha = 0.1, beta = 0.85, omega = 0.00001;
+  for (let i = 1; i < returns.length; i++) {
+    garchVol = Math.sqrt(omega + alpha * returns[i - 1] * returns[i - 1] + beta * garchVol * garchVol);
+  }
+
+  // Average True Range (ATR)
+  let atrSum = 0;
+  for (let i = 1; i < data.length; i++) {
+    const highLow = data[i].high - data[i].low;
+    const highClosePrev = Math.abs(data[i].high - data[i - 1].close);
+    const lowClosePrev = Math.abs(data[i].low - data[i - 1].close);
+    const trueRange = Math.max(highLow, highClosePrev, lowClosePrev);
+    atrSum += trueRange;
+  }
+  const averageTrueRange = atrSum / (data.length - 1);
+
+  return {
+    dailyVolatility,
+    realizedVolatility,
+    garchVolatility: garchVol,
+    averageTrueRange
+  };
+}
